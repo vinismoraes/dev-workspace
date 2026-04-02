@@ -1,26 +1,26 @@
 #!/bin/zsh
-# Usage: ./done-task.sh TICKET-1234
+# Usage: ./done-task.sh BRANCH
 # Removes all worktrees and the workspace directory for a completed task.
 #
 # Set REPOS_ROOT to the directory containing your repo clones (default: ~/GoProjects)
 
 REPOS_ROOT=${REPOS_ROOT:-~/GoProjects}
 
-TICKET=$1
-if [[ -z "$TICKET" ]]; then
-  echo "Usage: $0 TICKET-1234"
+BRANCH=$1
+if [[ -z "$BRANCH" ]]; then
+  echo "Usage: $0 BRANCH"
   exit 1
 fi
 
 WORKTREE_BASE="$REPOS_ROOT/worktrees"
-TASK_DIR="$WORKTREE_BASE/$TICKET"
+TASK_DIR="$WORKTREE_BASE/$BRANCH"
 
 if [[ ! -d "$TASK_DIR" ]]; then
   echo "No worktree directory found at $TASK_DIR"
   exit 1
 fi
 
-echo "Cleaning up worktrees for $TICKET..."
+echo "Cleaning up worktrees for $BRANCH..."
 
 for worktree_dir in "$TASK_DIR"/*/; do
   [[ -d "$worktree_dir" ]] || continue
@@ -32,11 +32,11 @@ for worktree_dir in "$TASK_DIR"/*/; do
     git -C "$REPO_PATH" worktree remove "$worktree_dir" --force 2>/dev/null && echo "  ✓ Worktree removed"
     git -C "$REPO_PATH" worktree prune 2>/dev/null
     # Only delete local branch — remote branch stays for the PR
-    git -C "$REPO_PATH" branch -d "$TICKET" 2>/dev/null && echo "  ✓ Local branch deleted" || true
+    git -C "$REPO_PATH" branch -d "$BRANCH" 2>/dev/null && echo "  ✓ Local branch deleted" || true
   fi
 done
 
 rm -rf "$TASK_DIR"
 
 echo ""
-echo "✅ Cleaned up $TICKET"
+echo "✅ Cleaned up $BRANCH"

@@ -1,7 +1,7 @@
 #!/bin/zsh
-# Usage: ./add-repo.sh TICKET-1234 repo1 [repo2 ...]
+# Usage: ./add-repo.sh BRANCH repo1 [repo2 ...]
 # Adds one or more repos to an existing task mid-flight.
-# Example: ./add-repo.sh PCHAT-9999 api-specs
+# Example: ./add-repo.sh my-feature api-specs
 #
 # Set REPOS_ROOT to the directory containing your repo clones (default: ~/GoProjects)
 
@@ -9,21 +9,21 @@ set -e
 
 REPOS_ROOT=${REPOS_ROOT:-~/GoProjects}
 
-TICKET=$1
+BRANCH=$1
 shift
 REPOS=("$@")
 
-if [[ -z "$TICKET" || ${#REPOS[@]} -eq 0 ]]; then
-  echo "Usage: $0 TICKET-1234 repo1 [repo2 ...]"
+if [[ -z "$BRANCH" || ${#REPOS[@]} -eq 0 ]]; then
+  echo "Usage: $0 BRANCH repo1 [repo2 ...]"
   exit 1
 fi
 
-TASK_DIR="$REPOS_ROOT/worktrees/$TICKET"
-WORKSPACE_FILE="$TASK_DIR/$TICKET.code-workspace"
+TASK_DIR="$REPOS_ROOT/worktrees/$BRANCH"
+WORKSPACE_FILE="$TASK_DIR/$BRANCH.code-workspace"
 
 if [[ ! -f "$WORKSPACE_FILE" ]]; then
-  echo "❌ No workspace found for $TICKET at $TASK_DIR"
-  echo "   Run ./new-task.sh $TICKET first."
+  echo "❌ No workspace found for $BRANCH at $TASK_DIR"
+  echo "   Run ./new-task.sh $BRANCH first."
   exit 1
 fi
 
@@ -48,10 +48,10 @@ for repo in $REPOS; do
   git -C "$REPO_PATH" update-ref refs/heads/main refs/remotes/origin/main 2>/dev/null || true
 
   echo "→ Creating worktree for $repo..."
-  if git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" -b "$TICKET" origin/main 2>/dev/null; then
-    echo "  ✓ Created branch $TICKET from origin/main"
-  elif git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" "$TICKET" 2>/dev/null; then
-    echo "  ✓ Checked out existing branch $TICKET"
+  if git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" -b "$BRANCH" origin/main 2>/dev/null; then
+    echo "  ✓ Created branch $BRANCH from origin/main"
+  elif git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" "$BRANCH" 2>/dev/null; then
+    echo "  ✓ Checked out existing branch $BRANCH"
   else
     echo "  ❌ Failed to create worktree for $repo — skipping"
     continue

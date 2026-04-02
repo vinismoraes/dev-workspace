@@ -1,7 +1,7 @@
 #!/bin/zsh
-# Usage: ./new-task.sh TICKET-1234 [repo1 repo2 ...]
+# Usage: ./new-task.sh BRANCH [repo1 repo2 ...]
 # Default repo: services
-# Example: ./new-task.sh PCHAT-9999
+# Example: ./new-task.sh my-feature
 # Example: ./new-task.sh PCHAT-9999 services backend-extensions api-specs
 #
 # Set REPOS_ROOT to the directory containing your repo clones (default: ~/GoProjects)
@@ -11,9 +11,9 @@ set -e
 
 REPOS_ROOT=${REPOS_ROOT:-~/GoProjects}
 
-TICKET=$1
-if [[ -z "$TICKET" ]]; then
-  echo "Usage: $0 TICKET-1234 [repo1 repo2 ...]"
+BRANCH=$1
+if [[ -z "$BRANCH" ]]; then
+  echo "Usage: $0 BRANCH [repo1 repo2 ...]"
   exit 1
 fi
 
@@ -21,8 +21,8 @@ shift
 REPOS=("${@:-services}")
 
 WORKTREE_BASE="$REPOS_ROOT/worktrees"
-TASK_DIR="$WORKTREE_BASE/$TICKET"
-WORKSPACE_FILE="$TASK_DIR/$TICKET.code-workspace"
+TASK_DIR="$WORKTREE_BASE/$BRANCH"
+WORKSPACE_FILE="$TASK_DIR/$BRANCH.code-workspace"
 
 mkdir -p "$TASK_DIR"
 
@@ -46,10 +46,10 @@ for repo in $REPOS; do
   git -C "$REPO_PATH" update-ref refs/heads/main refs/remotes/origin/main 2>/dev/null || true
 
   echo "→ Creating worktree for $repo at $WORKTREE_PATH..."
-  if git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" -b "$TICKET" origin/main 2>/dev/null; then
-    echo "  ✓ Created branch $TICKET from origin/main"
-  elif git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" "$TICKET" 2>/dev/null; then
-    echo "  ✓ Checked out existing branch $TICKET"
+  if git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" -b "$BRANCH" origin/main 2>/dev/null; then
+    echo "  ✓ Created branch $BRANCH from origin/main"
+  elif git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" "$BRANCH" 2>/dev/null; then
+    echo "  ✓ Checked out existing branch $BRANCH"
   else
     echo "  ❌ Failed to create worktree for $repo — skipping"
     continue
@@ -109,7 +109,7 @@ for i in {1..${#PALETTE[@]}}; do
   fi
 done
 if [[ $color_idx -eq 0 ]]; then
-  hash_val=$(echo -n "$TICKET" | cksum | awk '{print $1}')
+  hash_val=$(echo -n "$BRANCH" | cksum | awk '{print $1}')
   color_idx=$(( (hash_val % ${#PALETTE[@]}) + 1 ))
 fi
 IFS=: read -r BG_ACTIVE BG_INACTIVE <<< "${PALETTE[$color_idx]}"
@@ -130,7 +130,7 @@ IFS=: read -r BG_ACTIVE BG_INACTIVE <<< "${PALETTE[$color_idx]}"
   done
   echo '  ],'
   echo '  "settings": {'
-  echo "    \"window.title\": \"🔧 ${TICKET} — \${activeEditorShort}\","
+  echo "    \"window.title\": \"🔧 ${BRANCH} — \${activeEditorShort}\","
   echo '    "git.autoRepositoryDetection": false,'
   # Only scan top-level repo folders — prevents duplicate git discovery from subfolders
   local git_scan="["
@@ -157,7 +157,7 @@ IFS=: read -r BG_ACTIVE BG_INACTIVE <<< "${PALETTE[$color_idx]}"
 } > "$WORKSPACE_FILE"
 
 echo ""
-echo "✅ Task $TICKET is ready!"
+echo "✅ Task $BRANCH is ready!"
 echo "   Workspace: $WORKSPACE_FILE"
 echo "   Repos: ${folder_paths[*]}"
 echo ""

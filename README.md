@@ -18,12 +18,14 @@ This symlinks the scripts into `$REPOS_ROOT` (default: `~/GoProjects`) so they'r
 ### Start a task
 
 ```bash
-new-task.sh TICKET-1234 repo-a repo-b
+new-task.sh my-feature repo-a repo-b
 ```
 
+The first argument is the **branch name** — it can be anything: a ticket number (`PCHAT-1234`), a feature name (`add-search`), or an experiment (`experiment-v2`).
+
 This will:
-1. Create a worktree for each repo at `$REPOS_ROOT/worktrees/TICKET-1234/<repo>/`
-2. Check out a new branch named `TICKET-1234` in each worktree
+1. Create a worktree for each repo at `$REPOS_ROOT/worktrees/my-feature/<repo>/`
+2. Check out a new branch named `my-feature` in each worktree
 3. Generate a `.code-workspace` file with all repos as roots
 4. Open VS Code with the workspace
 
@@ -32,7 +34,7 @@ If no repos are specified, it defaults to `services`.
 ### Add a repo mid-task
 
 ```bash
-add-repo.sh TICKET-1234 repo-c
+add-repo.sh my-feature repo-c
 ```
 
 Adds a new worktree to an existing task and updates the workspace file.
@@ -40,7 +42,7 @@ Adds a new worktree to an existing task and updates the workspace file.
 ### Finish a task
 
 ```bash
-done-task.sh TICKET-1234
+done-task.sh my-feature
 ```
 
 Removes the worktrees and workspace directory. Remote branches stay intact.
@@ -60,10 +62,10 @@ Creates a local Git repo with an initial `main` branch, `go.mod`, and `main.go`.
 ├── services/                    # Main clone (never modified)
 ├── agent-orchestrator/          # Main clone (never modified)
 ├── worktrees/
-│   └── TICKET-1234/
-│       ├── services/            # Worktree on branch TICKET-1234
-│       ├── agent-orchestrator/  # Worktree on branch TICKET-1234
-│       └── TICKET-1234.code-workspace
+│   └── my-feature/
+│       ├── services/            # Worktree on branch my-feature
+│       ├── agent-orchestrator/  # Worktree on branch my-feature
+│       └── my-feature.code-workspace
 ├── new-task.sh → dev-workspace/new-task.sh
 ├── add-repo.sh → dev-workspace/add-repo.sh
 └── done-task.sh → dev-workspace/done-task.sh
