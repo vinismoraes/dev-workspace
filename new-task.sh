@@ -11,6 +11,8 @@ set -e
 
 REPOS_ROOT=${REPOS_ROOT:-~/GoProjects}
 
+source "${0:A:h}/lib/git-helpers.sh"
+
 BRANCH=$1
 if [[ -z "$BRANCH" ]]; then
   echo "Usage: $0 BRANCH [repo1 repo2 ...]"
@@ -41,9 +43,8 @@ for repo in $REPOS; do
   echo "→ Fetching latest for $repo..."
   git -C "$REPO_PATH" fetch origin --quiet --prune
 
-  # Update local main to match origin/main
   echo "→ Updating $repo local main..."
-  git -C "$REPO_PATH" update-ref refs/heads/main refs/remotes/origin/main 2>/dev/null || true
+  safe_update_main "$REPO_PATH" "$repo"
 
   echo "→ Creating worktree for $repo at $WORKTREE_PATH..."
   if git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" -b "$BRANCH" origin/main 2>/dev/null; then

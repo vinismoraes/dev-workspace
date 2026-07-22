@@ -9,6 +9,8 @@ set -e
 
 REPOS_ROOT=${REPOS_ROOT:-~/GoProjects}
 
+source "${0:A:h}/lib/git-helpers.sh"
+
 BRANCH=$1
 shift
 REPOS=("$@")
@@ -45,7 +47,7 @@ for repo in $REPOS; do
   git -C "$REPO_PATH" fetch origin --quiet --prune
 
   echo "→ Updating $repo local main..."
-  git -C "$REPO_PATH" update-ref refs/heads/main refs/remotes/origin/main 2>/dev/null || true
+  safe_update_main "$REPO_PATH" "$repo"
 
   echo "→ Creating worktree for $repo..."
   if git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" -b "$BRANCH" origin/main 2>/dev/null; then
