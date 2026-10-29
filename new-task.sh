@@ -158,6 +158,14 @@ IFS=: read -r BG_ACTIVE BG_INACTIVE <<< "${PALETTE[$color_idx]}"
 } > "$WORKSPACE_FILE"
 
 echo ""
+# Journal before reporting success or opening the workspace.
+journal_args=(start "$BRANCH")
+for repo in "${git_repos[@]}"; do
+  journal_args+=(--repo "$repo")
+done
+python3 "${0:A:h}/task-journal.py" "${journal_args[@]}"
+python3 "${0:A:h}/task-journal.py" verify "$BRANCH"
+
 echo "✅ Task $BRANCH is ready!"
 echo "   Workspace: $WORKSPACE_FILE"
 echo "   Repos: ${folder_paths[*]}"

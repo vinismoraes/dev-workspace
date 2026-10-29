@@ -23,7 +23,7 @@ done
 
 echo "Installing task scripts → $REPOS_ROOT"
 
-for f in "$SCRIPT_DIR"/{new-task,add-repo,done-task,quick-start-repo,sync-task,sync-main-clones,clean-clones}.sh; do
+for f in "$SCRIPT_DIR"/task-journal.py "$SCRIPT_DIR"/{new-task,add-repo,done-task,quick-start-repo,sync-task,sync-main-clones,clean-clones}.sh; do
   [[ -f "$f" ]] || continue
   name=$(basename "$f")
   target="$REPOS_ROOT/$name"

@@ -20,6 +20,11 @@ if [[ ! -d "$TASK_DIR" ]]; then
   exit 1
 fi
 
+# Record and verify completion before destructive workspace cleanup.
+# If journaling fails, leave the workspace available for recovery.
+python3 "${0:A:h}/task-journal.py" finish "$BRANCH" || exit 1
+python3 "${0:A:h}/task-journal.py" verify "$BRANCH" --completed || exit 1
+
 echo "Cleaning up worktrees for $BRANCH..."
 
 for worktree_dir in "$TASK_DIR"/*/; do
