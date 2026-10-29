@@ -27,7 +27,8 @@ This will:
 1. Create a worktree for each repo at `$REPOS_ROOT/worktrees/my-feature/<repo>/`
 2. Check out a new branch named `my-feature` in each worktree
 3. Generate a `.code-workspace` file with all repos as roots
-4. Open VS Code with the workspace
+4. Create/update the Obsidian project note and verify it
+5. Open VS Code with the workspace
 
 If no repos are specified, it defaults to `services`.
 
@@ -45,7 +46,20 @@ Adds a new worktree to an existing task and updates the workspace file.
 done-task.sh my-feature
 ```
 
-Removes the worktrees and workspace directory. Remote branches stay intact.
+Marks the Obsidian project note `DONE`, adds a linked completion entry to today's daily note, and verifies both before removing worktrees and the workspace directory. Remote branches stay intact. A journaling failure stops cleanup and returns a nonzero exit code.
+
+### Record completion without deleting a workspace
+
+```bash
+python3 "$REPOS_ROOT/task-journal.py" finish PP-97 --summary "Completed PDF ingestion assessment."
+python3 "$REPOS_ROOT/task-journal.py" verify PP-97 --completed
+```
+
+`task-journal.py start BRANCH --title "Task description" --repo repo-a` creates a project note or updates its status and branch. `finish` works even when no start script was used. Neither command removes worktrees. The installed script is a symlink into this repo.
+
+Requires Python 3. Vault defaults to `~/ObsidianVault`; override with `VAULT_ROOT` or `--vault`. Dates use the machine's local date; agents should pass `--date YYYY-MM-DD` when the user's date differs or when backfilling. Ticket IDs in prefixed branch names reuse existing project notes. Ambiguous matches and malformed notes fail explicitly. Existing note content is preserved; repeated same-day completion does not add duplicate entries. A vault lock serializes script writes across agents, and each note is replaced atomically. Manual Obsidian edits should not be made simultaneously with a script update.
+
+Run the regression suite with `python3 -m unittest discover -s tests -v`. Tests use temporary vaults and fake git/editor commands.
 
 ### Absorb latest `main` into an in-flight task
 
